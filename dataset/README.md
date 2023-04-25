@@ -55,7 +55,13 @@ description,full_name, starred_at 是需要的資料, id 只是看爬蟲會不�
       "id": 1296269,
       "full_name": "octocat/Hello-World",
       "html_url": "https://github.com/twitter/twitter",
-      "description": "This your first repo!"
+      "description": "This your first repo!",
+      "topics": [
+        "octocat",
+        "atom",
+        "electron",
+        "api"
+      ]
     }
   }
 ]
