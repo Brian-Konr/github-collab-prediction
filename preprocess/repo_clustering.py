@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import pandas as pd
 import argparse
+from sentence_transformers import SentenceTransformer
 from sklearn.cluster import KMeans
 
 
@@ -17,7 +18,7 @@ parser.add_argument(
         "glove.6B.300d",
         "bert-base-uncased",
         "roberta-base",
-        "sentence-transformers/paraphrase-MiniLM-L6-v2",
+        "sbert",
         "huggingface/CodeBERTa-small-v1",
         "all",
     ],
@@ -28,12 +29,7 @@ parser.add_argument(
 parser.add_argument(
     "--cluster_method",
     type=str,
-    choices=[
-        None,
-        "kmeans",
-        "dbscan",
-        "all"
-    ],
+    choices=[None, "kmeans", "dbscan", "all"],
     default=None,
     help="cluster method",
 )
@@ -101,9 +97,13 @@ for i in range(len(df)):
     )
     trainset.append(data)
 
-if args.model_name == "glove.6b.300d":
+
+if args.model_name == "all":
     raise NotImplementedError
-elif args.model_name == "all":
+elif os.path.exists(os.poth.join(args.result_dir, f"{args.model_name}_embeddings.npy")):
+    print(f"Embedding for {args.model_name} already exists, skip")
+    exit()
+elif args.model_name == "glove.6b.300d":
     raise NotImplementedError
 elif args.model_name in [
     "bert-base-uncased",
@@ -149,3 +149,12 @@ elif args.model_name in [
         os.path.join(args.result_dir, f"{args.model_name}_embeddings.npy"), "wb"
     ) as f:
         np.save(f, all_embeddings)
+
+elif args.model_name == "sbert":
+    model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
+    embeddings = model.encode(trainset)
+
+    with open(
+        os.path.join(args.result_dir, f"{args.model_name}_embeddings.npy"), "wb"
+    ) as f:
+        np.save(f, embeddings)
