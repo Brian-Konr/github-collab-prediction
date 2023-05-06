@@ -74,6 +74,15 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+model_2_path = {
+    "glove": "glove.6b.300d",
+    "bert": "bert-base-uncased",
+    "roberta": "roberta-base",
+    "sbert": "sbert",
+    "codeberta": "huggingface/CodeBERTa-small-v1",
+    "all": "all",
+}
+
 # Set up random seed manually
 torch.manual_seed(args.seed)
 torch.cuda.manual_seed(args.seed)
@@ -98,21 +107,24 @@ for i in range(len(df)):
     )
     trainset.append(data)
 
+emb: np.array = None
 
 if args.model_name == "all":
     raise NotImplementedError
 elif os.path.exists(os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy")):
     print(f"Embedding for {args.model_name} already exists, skip")
+    with open(os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"), "rb") as f:
+        emb = np.load(f)
     exit()
-elif args.model_name == "glove.6b.300d":
+elif args.model_name == "glove":
     raise NotImplementedError
 elif args.model_name in [
     "bert-base-uncased",
     "roberta-base",
     "huggingface/CodeBERTa-small-v1",
 ]:
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
-    model = AutoModel.from_pretrained(args.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_2_path[args.model_name])
+    model = AutoModel.from_pretrained(model_2_path[args.model_name])
 
     model.eval()
     model.to(args.device)
@@ -138,6 +150,13 @@ elif args.model_name in [
             ).cpu().numpy()
         elif args.strategy == "cls":
             embeddings = outputs.last_hidden_state[:, 0, :].cpu().numpy()
+        elif args.strategy == "max":
+            attention_mask = inputs.attention_mask.unsqueeze(-1)
+            embeddings = (
+                torch.max(outputs.last_hidden_state * attention_mask, dim=1)
+                .values.cpu()
+                .numpy()
+            )
         else:
             raise NotImplementedError("Invalid Strategy")
 
@@ -151,6 +170,8 @@ elif args.model_name in [
     ) as f:
         np.save(f, all_embeddings)
 
+    emb = all_embeddings
+
 elif args.model_name == "sbert":
     model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
     embeddings = model.encode(trainset)
@@ -159,3 +180,9 @@ elif args.model_name == "sbert":
         os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"), "wb"
     ) as f:
         np.save(f, embeddings)
+
+    emb = embeddings
+
+# Clustering Part
+
+# Evaluation Part
