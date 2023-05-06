@@ -35,7 +35,10 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--result_dir", type=str, default="postprocess_data", help="path to save result"
+    "--result_dir",
+    type=str,
+    default="../dataset/postprocess_data",
+    help="path to save result",
 )
 
 parser.add_argument(
@@ -111,9 +114,16 @@ emb: np.array = None
 
 if args.model_name == "all":
     raise NotImplementedError
-elif os.path.exists(os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy")):
+elif os.path.exists(
+    os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy")
+):
     print(f"Embedding for {args.model_name} already exists, skip")
-    with open(os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"), "rb") as f:
+    with open(
+        os.path.join(
+            args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"
+        ),
+        "rb",
+    ) as f:
         emb = np.load(f)
     exit()
 elif args.model_name == "glove":
@@ -131,7 +141,7 @@ elif args.model_name in [
 
     for i in range(0, len(trainset), args.batch_size):
         batch = (
-            trainset[i: i + args.batch_size]
+            trainset[i : i + args.batch_size]
             if i + args.batch_size <= len(trainset)
             else trainset[i:]
         )
@@ -145,9 +155,13 @@ elif args.model_name in [
         if args.strategy == "mean":
             attention_mask = inputs.attention_mask.unsqueeze(-1)
             embeddings = (
-                torch.sum(outputs.last_hidden_state * attention_mask, dim=1)
-                / torch.sum(attention_mask, dim=1)
-            ).cpu().numpy()
+                (
+                    torch.sum(outputs.last_hidden_state * attention_mask, dim=1)
+                    / torch.sum(attention_mask, dim=1)
+                )
+                .cpu()
+                .numpy()
+            )
         elif args.strategy == "cls":
             embeddings = outputs.last_hidden_state[:, 0, :].cpu().numpy()
         elif args.strategy == "max":
@@ -166,7 +180,10 @@ elif args.model_name in [
             all_embeddings = np.concatenate((all_embeddings, embeddings), axis=0)
 
     with open(
-        os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"), "wb"
+        os.path.join(
+            args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"
+        ),
+        "wb",
     ) as f:
         np.save(f, all_embeddings)
 
@@ -177,7 +194,10 @@ elif args.model_name == "sbert":
     embeddings = model.encode(trainset)
 
     with open(
-        os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"), "wb"
+        os.path.join(
+            args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"
+        ),
+        "wb",
     ) as f:
         np.save(f, embeddings)
 
