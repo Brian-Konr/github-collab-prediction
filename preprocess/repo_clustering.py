@@ -129,9 +129,9 @@ elif os.path.exists(
 elif args.model_name == "glove":
     raise NotImplementedError
 elif args.model_name in [
-    "bert-base-uncased",
-    "roberta-base",
-    "huggingface/CodeBERTa-small-v1",
+    "bert",
+    "roberta",
+    "codeberta",
 ]:
     tokenizer = AutoTokenizer.from_pretrained(model_2_path[args.model_name])
     model = AutoModel.from_pretrained(model_2_path[args.model_name])
