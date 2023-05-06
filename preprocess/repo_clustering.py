@@ -84,6 +84,7 @@ if torch.cuda.is_available():
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
+print("Loading data...")
 df = pd.read_csv("../dataset/data/repos.csv")
 
 trainset = list()
@@ -100,7 +101,7 @@ for i in range(len(df)):
 
 if args.model_name == "all":
     raise NotImplementedError
-elif os.path.exists(os.poth.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy")):
+elif os.path.exists(os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy")):
     print(f"Embedding for {args.model_name} already exists, skip")
     exit()
 elif args.model_name == "glove.6b.300d":
@@ -118,7 +119,7 @@ elif args.model_name in [
 
     for i in range(0, len(trainset), args.batch_size):
         batch = (
-            trainset[i : i + args.batch_size]
+            trainset[i: i + args.batch_size]
             if i + args.batch_size <= len(trainset)
             else trainset[i:]
         )
