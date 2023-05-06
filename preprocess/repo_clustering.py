@@ -134,7 +134,7 @@ elif args.model_name in [
             attention_mask = inputs.attention_mask.unsqueeze(-1)
             embeddings = (
                 torch.sum(outputs.last_hidden_state * attention_mask, dim=1)
-                / torch.sum(attention_mask, dim=1).
+                / torch.sum(attention_mask, dim=1)
             ).cpu().numpy()
         elif args.strategy == "cls":
             embeddings = outputs.last_hidden_state[:, 0, :].cpu().numpy()
