@@ -61,7 +61,7 @@ parser.add_argument(
 parser.add_argument(
     "--strategy",
     type=str,
-    choices=["mean", "cls"],
+    choices=["mean", "cls", "max"],
     help="strategy for extract embedding from bert-like model",
 )
 
@@ -100,7 +100,7 @@ for i in range(len(df)):
 
 if args.model_name == "all":
     raise NotImplementedError
-elif os.path.exists(os.poth.join(args.result_dir, f"{args.model_name}_embeddings.npy")):
+elif os.path.exists(os.poth.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy")):
     print(f"Embedding for {args.model_name} already exists, skip")
     exit()
 elif args.model_name == "glove.6b.300d":
@@ -146,7 +146,7 @@ elif args.model_name in [
             all_embeddings = np.concatenate((all_embeddings, embeddings), axis=0)
 
     with open(
-        os.path.join(args.result_dir, f"{args.model_name}_embeddings.npy"), "wb"
+        os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"), "wb"
     ) as f:
         np.save(f, all_embeddings)
 
@@ -155,6 +155,6 @@ elif args.model_name == "sbert":
     embeddings = model.encode(trainset)
 
     with open(
-        os.path.join(args.result_dir, f"{args.model_name}_embeddings.npy"), "wb"
+        os.path.join(args.result_dir, f"{args.model_name}_embeddings_{args.strategy}.npy"), "wb"
     ) as f:
         np.save(f, embeddings)
