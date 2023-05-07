@@ -165,3 +165,5 @@ output/
 
 # python venv bin folder
 github-collab-prediction-venv/
+
+**/users_v2.csv
