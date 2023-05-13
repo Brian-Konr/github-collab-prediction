@@ -102,7 +102,7 @@ df = pd.read_csv("../dataset/data/repos.csv")
 trainset = list()
 
 for i in range(len(df)):
-    row = df.iloc[1709]
+    row = df.iloc[i]
     data = (
         f"Repo name: {row['name'].split('/')[-1]}. Description: {row['description']}."
         f"Programming Language: {eval(row['languages'])[0] if eval(row['languages']) else 'Document'}. "
