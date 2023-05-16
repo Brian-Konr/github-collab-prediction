@@ -167,3 +167,5 @@ output/
 github-collab-prediction-venv/
 
 **/users_v2.csv
+
+*.npy
